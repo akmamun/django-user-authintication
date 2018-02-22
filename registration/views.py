@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .tokens import account_activation_token
-from registration.forms import SignupForm
+from registration.forms import SignupForm, LoginForm
 from django.core.mail import EmailMessage
 
 
@@ -48,8 +48,20 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        login(request, user)
-        # return redirect('home')
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+        HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+        return redirect('login')
     else:
         return HttpResponse('Activation link is invalid!')
+
+def login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = form.authenticate()
+        if user:
+            return redirect("/todo")
+        else:
+            return HttpResponse("Login Failed Please enter correct!")
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})

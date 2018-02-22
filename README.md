@@ -7,3 +7,4 @@
 
 * User Registration / Login
 * Mail Sending Registration
+* Add Celery
